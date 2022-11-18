@@ -14,19 +14,20 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          java-version: 1.7
-          server-id: ossrh
-          server-username: SONATYPE_USERNAME
-          server-password: SONATYPE_PASSWORD
-          gpg-private-key: ${{ secrets.KEYSTORE }}
-          gpg-passphrase: PRIVATE_KEY_PASSPHRASE
+          distribution: adopt
+          java-version: 8
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
         env:
-          SONATYPE_USERNAME: 'braginxv'
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          PRIVATE_KEY_PASSPHRASE: ${{ secrets.PRIVATE_KEY_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_userName: 'braginxv'
+          ORG_GRADLE_PROJECT_userPassword: ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKeyId: '677996BC'
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.KEYSTORE }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PRIVATE_KEY_PASSPHRASE }}
         with:
           gradle-version: 7.1.1
-          arguments: publish
+          arguments: |
+            build
+            sign
+            publish

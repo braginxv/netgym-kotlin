@@ -7,10 +7,12 @@ version = "0.5-SNAPSHOT"
 
 plugins {
     kotlin("jvm")
+    id("org.jetbrains.dokka") version "1.7.20"
     `java-library`
     `maven-publish`
     signing
 }
+
 
 repositories {
     mavenCentral()
@@ -23,12 +25,14 @@ java {
     withJavadocJar()
 }
 
+val javadocJar = tasks.named<Jar>("javadocJar") {
+    from(tasks.named("dokkaJavadoc"))
+}
+
 publishing {
     publications {
         create<MavenPublication>("netgym-kotlin") {
             from(components["java"])
-//            artifactId = "netgym-kotlin"
-//            groupId = "com.github.braginxv"
 
             pom {
                 packaging = "jar"
@@ -70,16 +74,21 @@ publishing {
             val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
             val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
-//            credentials {
-//                username = project.properties["braginxv"].toString()
-//                password = project.properties["ossrhPassword"].toString()
-//            }
+            credentials {
+                val userName: String? by project
+                val userPassword: String? by project
+
+                username = userName
+                password = userPassword
+            }
         }
     }
 }
 
 signing {
-    useGpgCmd()
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign(configurations.archives.get())
 }
 
@@ -90,6 +99,5 @@ tasks.test {
 dependencies {
     api("com.github.braginxv:netgym:${netgymVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
-//    implementation("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }

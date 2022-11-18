@@ -1,10 +1,9 @@
-name: Maven Package
+name: Test Package
 
 on: push
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -12,10 +11,12 @@ jobs:
 
       - name: Setup environment
         uses: actions/setup-java@v3
-        with:
-          java-version: 1.7
 
-    - name: Setup Gradle
+        with:
+          java-version: 8
+          distribution: adopt
+
+      - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.1.1
