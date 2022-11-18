@@ -1,0 +1,32 @@
+name: Maven Package
+
+on:
+  push:
+    tags: v*.*
+
+jobs:
+  build:
+    if: github.repository == 'braginxv/netgym-kotlin' && github.actor == 'braginxv'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 1.7
+          server-id: ossrh
+          server-username: SONATYPE_USERNAME
+          server-password: SONATYPE_PASSWORD
+          gpg-private-key: ${{ secrets.KEYSTORE }}
+          gpg-passphrase: PRIVATE_KEY_PASSPHRASE
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        env:
+          SONATYPE_USERNAME: 'braginxv'
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          PRIVATE_KEY_PASSPHRASE: ${{ secrets.PRIVATE_KEY_PASSPHRASE }}
+        with:
+          gradle-version: 7.1.1
+          arguments: publish
