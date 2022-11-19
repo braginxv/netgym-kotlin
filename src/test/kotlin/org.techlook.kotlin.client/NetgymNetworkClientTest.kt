@@ -26,6 +26,7 @@ package org.techlook.kotlin.client
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.techlook.net.client.kotlin.NetgymHttpClient
 
 class NetgymNetworkClientTest {
     @Test

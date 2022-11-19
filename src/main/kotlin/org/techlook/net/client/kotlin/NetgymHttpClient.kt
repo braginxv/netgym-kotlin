@@ -22,13 +22,16 @@
  * THE SOFTWARE.
  */
 
-package org.techlook.kotlin.client
+package org.techlook.net.client.kotlin
 
-import org.techlook.ClientSystem
-import org.techlook.Either
-import org.techlook.http.*
-import org.techlook.http.adapters.*
-import org.techlook.http.client.HttpListener
+import org.techlook.net.client.ClientSystem
+import org.techlook.net.client.Either
+import org.techlook.net.client.http.*
+import org.techlook.net.client.http.adapters.ByteResponseListener
+import org.techlook.net.client.http.adapters.Response
+import org.techlook.net.client.http.adapters.StringResponse
+import org.techlook.net.client.http.adapters.StringResponseListener
+import org.techlook.net.client.http.client.HttpListener
 import java.net.URL
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
@@ -51,7 +54,7 @@ typealias NamedParams = Set<Pair<String, String>>
  * @param connectionLifetime - HTTP 1.1 Close, Keepalive or Pipelining connection
  * @see ConnectionLifetime
  *
- * @param userAgent - User-Agent header in HTTP request
+ * @param userAgent - User-Agent header in HTTP method
  *
  * @param basicHeaders - set of HTTP headers presented in all requests sent via this http-client instance
  *
@@ -97,7 +100,7 @@ class NetgymHttpClient(
     private val headers = basicHeaders + Pair(AGENT_HEADER, userAgent)
 
     /**
-     * GET HTTP request: baseUrl/resource
+     * GET HTTP method: baseUrl/resource
      * @param resource - path to resource relative to baseUrl
      * @param additionalHeaders - additional headers to base headers specified when client instance was created
      * @param parameters - url-encoded parameters
@@ -115,7 +118,7 @@ class NetgymHttpClient(
     }
 
     /**
-     * HEAD HTTP request: baseUrl/resource
+     * HEAD HTTP method: baseUrl/resource
      * @param resource - path to resource relative to baseUrl
      * @param additionalHeaders - additional headers to base headers specified when client instance was created
      * @param parameters - url-encoded parameters
@@ -133,7 +136,43 @@ class NetgymHttpClient(
     }
 
     /**
-     * GET HTTP request: baseUrl/resource
+     * TRACE HTTP method: baseUrl/resource
+     * @param resource - path to resource relative to baseUrl
+     * @param additionalHeaders - additional headers to base headers specified when client instance was created
+     * @param parameters - url-encoded parameters
+     *
+     * @return server response in string representation
+     */
+    suspend fun trace(
+        resource: String,
+        additionalHeaders: NamedParams = emptySet(),
+        parameters: NamedParams = emptySet()
+    ): StringResponse = suspendCoroutine { continuation ->
+        stringRequest(additionalHeaders, continuation) { headers, listener ->
+            connection.trace(resource, toTechlook(headers), toTechlook(parameters), listener)
+        }
+    }
+
+    /**
+     * CONNECT HTTP method: baseUrl/resource
+     * @param resource - path to resource relative to baseUrl
+     * @param additionalHeaders - additional headers to base headers specified when client instance was created
+     * @param parameters - url-encoded parameters
+     *
+     * @return server response in string representation
+     */
+    suspend fun connect(
+        resource: String,
+        additionalHeaders: NamedParams = emptySet(),
+        parameters: NamedParams = emptySet()
+    ): StringResponse = suspendCoroutine { continuation ->
+        stringRequest(additionalHeaders, continuation) { headers, listener ->
+            connection.connect(resource, toTechlook(headers), toTechlook(parameters), listener)
+        }
+    }
+
+    /**
+     * GET HTTP method: baseUrl/resource
      * @param resource - path to resource relative to baseUrl
      * @param additionalHeaders - additional headers to base headers specified when client instance was created
      * @param parameters - url-encoded parameters
@@ -151,7 +190,66 @@ class NetgymHttpClient(
     }
 
     /**
-     * PUT HTTP request: baseUrl/resource
+     * OPTIONS HTTP method: baseUrl/resource
+     * @param path - path to resource relative to baseUrl
+     * @param additionalHeaders - additional headers to base headers specified when client instance was created
+     * @param parameters - url-encoded parameters
+     *
+     * @return server response in string representation
+     */
+    suspend fun options(
+        path: String,
+        additionalHeaders: NamedParams = emptySet(),
+        parameters: NamedParams = emptySet()
+    ): StringResponse = suspendCoroutine { continuation ->
+        stringRequest(additionalHeaders, continuation) { headers, listener ->
+            connection.optionsWithUrl(path, toTechlook(headers), toTechlook(parameters), listener)
+        }
+    }
+
+    /**
+     * OPTIONS "*" HTTP method to get general server capabilities: baseUrl/resource
+     * @param additionalHeaders - additional headers to base headers specified when client instance was created
+     *
+     * @return server response in string representation
+     */
+    suspend fun optionsServer(
+        additionalHeaders: NamedParams = emptySet(),
+    ): StringResponse = suspendCoroutine { continuation ->
+        stringRequest(additionalHeaders, continuation) { headers, listener ->
+            connection.options(toTechlook(headers), listener)
+        }
+    }
+
+    /**
+     * PATCH HTTP method: baseUrl/resource
+     * @param resource - path to resource relative to baseUrl
+     * @param requestBody - request body itself
+     * @param contentType - MIME-type of the content
+     * @param charset - encoding charset of the request body
+     * @param additionalHeaders - additional headers to base headers specified when client instance was created
+     * @param parameters - url-encoded parameters
+     *
+     * @return server response in string representation
+     */
+    suspend fun patch(
+        resource: String,
+        requestBody: String,
+        contentType: String,
+        charset: Charset = StandardCharsets.UTF_8,
+        additionalHeaders: NamedParams = emptySet(),
+        parameters: NamedParams = emptySet()
+    ): StringResponse = suspendCoroutine { continuation ->
+        stringRequest(additionalHeaders, continuation) { headers, listener ->
+            connection.patch(
+                resource, toTechlook(headers), toTechlook(parameters), contentType, charset,
+                requestBody.toByteArray(charset), listener
+            )
+        }
+    }
+
+    /**
+     * PUT HTTP method: baseUrl/resource
      * @param resource - path to resource relative to baseUrl
      * @param requestBody - request body itself
      * @param contentType - MIME-type of the content
@@ -178,7 +276,7 @@ class NetgymHttpClient(
     }
 
     /**
-     * DELETE HTTP request: baseUrl/resource
+     * DELETE HTTP method: baseUrl/resource
      * @param resource - path to resource relative to baseUrl
      * @param requestBody - request body itself
      * @param contentType - MIME-type of the content
@@ -205,7 +303,7 @@ class NetgymHttpClient(
     }
 
     /**
-     * POST HTTP request: baseUrl/resource
+     * POST HTTP method: baseUrl/resource
      * @param resource - path to resource relative to baseUrl
      * @param requestBody - request body itself
      * @param contentType - MIME-type of the content
@@ -232,7 +330,7 @@ class NetgymHttpClient(
     }
 
     /**
-     * Url-encoded POST HTTP request: baseUrl/resource
+     * Url-encoded POST HTTP method: baseUrl/resource
      * @param resource - path to resource relative to baseUrl
      * @param parameters - url-encoded parameters
      * @param additionalHeaders - additional headers to base headers specified where client instance is created
@@ -250,7 +348,7 @@ class NetgymHttpClient(
     }
 
     /**
-     * Multipart Form POST HTTP request: baseUrl/resource
+     * Multipart Form POST HTTP method: baseUrl/resource
      * @param resource - path to resource relative to baseUrl
      * @param formData - multipart form data
      * @param additionalHeaders - additional headers to base headers specified when client instance was created
@@ -352,9 +450,9 @@ class NetgymHttpClient(
             return basePart.dropLastWhile { it != '/' }
         }
 
-        private fun <K, V> toTechlook(keyValueSet: Set<Pair<K, V>>): Set<org.techlook.http.Pair<K, V>> =
+        private fun <K, V> toTechlook(keyValueSet: Set<Pair<K, V>>): Set<org.techlook.net.client.http.Pair<K, V>> =
             keyValueSet.map { (key, value) ->
-                org.techlook.http.Pair(key, value)
+                org.techlook.net.client.http.Pair(key, value)
             }.toSet()
 
         private fun fromProtocol(

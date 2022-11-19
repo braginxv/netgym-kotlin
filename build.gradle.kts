@@ -1,4 +1,4 @@
-val netgymVersion by extra("0.9")
+val netgymVersion by extra("1.0.0-SNAPSHOT")
 val coroutinesVersion by extra("1.6.1")
 val kotlinVersion: String by project
 
@@ -18,6 +18,10 @@ repositories {
     mavenCentral()
     google()
     gradlePluginPortal()
+    maven {
+        name = "Sonatype snapshots"
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    }
 }
 
 java {

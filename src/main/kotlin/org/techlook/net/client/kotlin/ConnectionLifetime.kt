@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package org.techlook.kotlin.client
+package org.techlook.net.client.kotlin
 
 enum class ConnectionLifetime {
     /** sets header - connection: close

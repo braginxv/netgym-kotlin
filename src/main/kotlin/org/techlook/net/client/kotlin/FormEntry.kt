@@ -1,7 +1,7 @@
-package org.techlook.kotlin.client
+package org.techlook.net.client.kotlin
 
-import org.techlook.http.FormField
-import org.techlook.http.FormFileField
+import org.techlook.net.client.http.FormField
+import org.techlook.net.client.http.FormFileField
 import java.nio.charset.Charset
 
 /**
