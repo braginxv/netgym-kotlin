@@ -77,6 +77,7 @@ class NetgymHttpClient(
     (baseUrl.port.takeIf { it > 0 } ?: baseUrl.defaultPort).let { port ->
       val keyManagers: Array<KeyManager>? = clientKeyManagers?.toList()?.toTypedArray()
       val additionalTrustManagers: Array<TrustManager>? = trustManagers?.toList()?.toTypedArray()
+
       when (connectionLifetime) {
         ConnectionLifetime.Closable -> SingleConnection(
           baseUrl.host,
@@ -105,7 +106,7 @@ class NetgymHttpClient(
   /**
    * GET HTTP method: baseUrl/resource
    * @param resource - path to resource relative to baseUrl
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are additional to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response
@@ -123,7 +124,7 @@ class NetgymHttpClient(
   /**
    * HEAD HTTP method: baseUrl/resource
    * @param resource - path to resource relative to baseUrl
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in string representation
@@ -141,7 +142,7 @@ class NetgymHttpClient(
   /**
    * TRACE HTTP method: baseUrl/resource
    * @param resource - path to resource relative to baseUrl
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in string representation
@@ -159,7 +160,7 @@ class NetgymHttpClient(
   /**
    * CONNECT HTTP method: baseUrl/resource
    * @param resource - path to resource relative to baseUrl
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in string representation
@@ -177,7 +178,7 @@ class NetgymHttpClient(
   /**
    * GET HTTP method: baseUrl/resource
    * @param resource - path to resource relative to baseUrl
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in raw byte buffer representation
@@ -195,7 +196,7 @@ class NetgymHttpClient(
   /**
    * OPTIONS HTTP method: baseUrl/resource
    * @param path - path to resource relative to baseUrl
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in string representation
@@ -212,7 +213,7 @@ class NetgymHttpClient(
 
   /**
    * OPTIONS "*" HTTP method to get general server capabilities: baseUrl/resource
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    *
    * @return server response in string representation
    */
@@ -230,7 +231,7 @@ class NetgymHttpClient(
    * @param requestBody - request body itself
    * @param contentType - MIME-type of the content
    * @param charset - encoding charset of the request body
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in string representation
@@ -256,7 +257,7 @@ class NetgymHttpClient(
    * @param requestBody - request body itself
    * @param contentType - MIME-type of the content
    * @param charset - encoding charset of the request body
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in string representation
@@ -282,7 +283,7 @@ class NetgymHttpClient(
    * @param requestBody - request body itself
    * @param contentType - MIME-type of the content
    * @param charset - encoding charset of the request body
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in raw byte buffer representation
@@ -308,7 +309,7 @@ class NetgymHttpClient(
    * @param requestBody - request body itself
    * @param contentType - MIME-type of the content
    * @param charset - encoding charset of the request body
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in string representation
@@ -334,7 +335,7 @@ class NetgymHttpClient(
    * @param requestBody - request body itself
    * @param contentType - MIME-type of the content
    * @param charset - encoding charset of the request body
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in raw byte buffer representation
@@ -360,7 +361,7 @@ class NetgymHttpClient(
    * @param requestBody - request body itself
    * @param contentType - MIME-type of the content
    * @param charset - encoding charset of the request body
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in string representation
@@ -374,8 +375,13 @@ class NetgymHttpClient(
     parameters: NamedParams = emptyMap()
   ): StringResponse = suspendCoroutine { continuation ->
     stringRequest(additionalHeaders, continuation) { headers, listener ->
-      connection.postContent(basePartOfUrl + resource, toTechlook(headers), toTechlook(parameters), contentType, charset,
-        requestBody.toByteArray(charset), listener
+      connection.postContent(basePartOfUrl + resource,
+        toTechlook(headers),
+        toTechlook(parameters),
+        contentType,
+        charset,
+        requestBody.toByteArray(charset),
+        listener
       )
     }
   }
@@ -386,7 +392,7 @@ class NetgymHttpClient(
    * @param requestBody - request body itself
    * @param contentType - MIME-type of the content
    * @param charset - encoding charset of the request body
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @param parameters - url-encoded parameters
    *
    * @return server response in raw byte buffer representation
@@ -400,8 +406,13 @@ class NetgymHttpClient(
     parameters: NamedParams = emptyMap()
   ): Response = suspendCoroutine { continuation ->
     rawRequest(additionalHeaders, continuation) { headers, listener ->
-      connection.postContent(basePartOfUrl + resource, toTechlook(headers), toTechlook(parameters), contentType, charset,
-        requestBody, listener
+      connection.postContent(basePartOfUrl + resource,
+        toTechlook(headers),
+        toTechlook(parameters),
+        contentType,
+        charset,
+        requestBody,
+        listener
       )
     }
   }
@@ -420,7 +431,10 @@ class NetgymHttpClient(
     additionalHeaders: NamedParams = emptyMap()
   ): StringResponse = suspendCoroutine { continuation ->
     stringRequest(additionalHeaders, continuation) { headers, listener ->
-      connection.postWithEncodedParameters(basePartOfUrl + resource, toTechlook(headers), toTechlook(parameters), listener)
+      connection.postWithEncodedParameters(basePartOfUrl + resource,
+        toTechlook(headers),
+        toTechlook(parameters),
+        listener)
     }
   }
 
@@ -438,7 +452,10 @@ class NetgymHttpClient(
     additionalHeaders: NamedParams = emptyMap()
   ): Response = suspendCoroutine { continuation ->
     rawRequest(additionalHeaders, continuation) { headers, listener ->
-      connection.postWithEncodedParameters(basePartOfUrl + resource, toTechlook(headers), toTechlook(parameters), listener)
+      connection.postWithEncodedParameters(basePartOfUrl + resource,
+        toTechlook(headers),
+        toTechlook(parameters),
+        listener)
     }
   }
 
@@ -446,7 +463,7 @@ class NetgymHttpClient(
    * Multipart Form POST HTTP method: baseUrl/resource
    * @param resource - path to resource relative to baseUrl
    * @param formData - multipart form data
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @return server response in string representation
    */
   suspend fun postFormData(
@@ -478,7 +495,7 @@ class NetgymHttpClient(
    * Multipart Form POST HTTP method: baseUrl/resource
    * @param resource - path to resource relative to baseUrl
    * @param formData - multipart form data
-   * @param additionalHeaders - additional headers to base headers specified when client instance was created
+   * @param additionalHeaders - headers which are in addition to base headers specified when client instance is created
    * @return server response in raw byte buffer representation
    */
   suspend fun rawPostFormData(

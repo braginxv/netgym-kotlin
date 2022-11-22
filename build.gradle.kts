@@ -40,17 +40,18 @@ publishing {
 
       pom {
         packaging = "jar"
-        name.set("Example Application")
+        name.set("Netgym network library for Kotlin")
         url.set("https://github.com/braginxv/netgym-kotlin")
 
         description.set(
-          "Full-featured high performance asynchronous network library for a client side of jvm-apps (including Android).\n" +
-                  "It provides handling of a large number of parallel connections (TCP, UDP) using a single client instance."
+          """High performance asynchronous network library for a client side of jvm-apps (including Android).
+            It provides handling of a large number of parallel connections (TCP, UDP) using a single client instance."""
+            .trimMargin()
         )
 
         scm {
-          connection.set("scm:git:https://github.com/braginxv/netgym-kotlin")
-          developerConnection.set("scm:git:https://github.com/braginxv/netgym-kotlin")
+          connection.set("scm:https://github.com/braginxv/netgym-kotlin.git")
+          developerConnection.set("scm:git@github.com:braginxv/netgym-kotlin.git")
           url.set("https://github.com/braginxv/netgym-kotlin")
           tag.set("HEAD")
         }

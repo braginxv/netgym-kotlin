@@ -27,9 +27,10 @@ package org.techlook.kotlin.client
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
+import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.techlook.net.client.SocketClient
 import org.techlook.net.client.http.client.HttpListener
@@ -87,7 +88,7 @@ class NetgymNetworkClientTest {
 
 
   @Test
-  fun `test a base url assembly when single url parts match`() {
+  fun `test a base url assembly when whole url parts match`() {
     val urls = listOf(
       "protocol://www.domain.org/common/path/first/sub/",
       "protocol://www.domain.org/common/path/first/sub/resource.txt",
@@ -147,7 +148,7 @@ class NetgymNetworkClientTest {
   }
 
   @Test
-  fun `test a http method filling`() = runBlocking {
+  fun `test a http method filling`() = runTest {
     val httpListener = slot<HttpListener>()
 
     every { client.connection.put(any(), any(), any(), any(), any(), any(), capture(httpListener)) } answers {

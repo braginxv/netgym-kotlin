@@ -1,7 +1,7 @@
 
-### This is the concise wrapper around the Netgym network library (https://github.com/braginxv/netgym) for more convenient use in Kotlin
+### A concise wrapper around the Netgym network library (https://github.com/braginxv/netgym) for more convenient development in Kotlin
 
-To add this library to your project insert into the gradle build script (in Gradle Kotlin notation):
+To add this library to your project insert into the gradle build script (using Gradle Kotlin notation):
 
 ```
 repositories {
